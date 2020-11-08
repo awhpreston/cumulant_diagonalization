@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, List, Any
 
-DOW_JONES_RELATIVE_PATH = "dow_jones/dow_jones_index.data"
+from data_handling.global_data_params import DOW_JONES_RELATIVE_PATH, DEFAULT_LOCAL_PATH
 
 
 @dataclass
@@ -31,7 +31,7 @@ class DowJonesEntries:
     percent_return_next_dividend: np.ndarray
 
 
-def read_csv(file_path: Path) -> Dict[str, List[Any]]:
+def read_csv(file_path: Path = DEFAULT_LOCAL_PATH / DOW_JONES_RELATIVE_PATH) -> Dict[str, List[Any]]:
     """
     Reads a comma-separated-variables file to a dictionary whose keys are the first row entries and whose values
     are lists of row entries for each column.
@@ -101,7 +101,23 @@ def from_dict_to_dow_jones_entries(data_dict: Dict[str, List[Any]]) -> DowJonesE
     return dj_object
 
 
+def from_dow_jones_entries_to_numpy(dj_entries: DowJonesEntries) -> np.ndarray:
+    """
+    Converts the data from a DoWJonesEntries dataclass object to a numpy array of shape (N, D) where N is the number pf
+    samples and =13 is the data dimension.
+    :param dj_entries: a DowJonesEntries object containing data
+    :return: numpy array of shape (N, 13)
+    """
+    arrays = [dj_entries.quarter, dj_entries.open, dj_entries.high, dj_entries.low, dj_entries.close, dj_entries.volume,
+              dj_entries.percent_change_price, dj_entries.percent_change_next_weeks_price,
+              dj_entries.percent_change_volume_over_last_wk, dj_entries.percent_return_next_dividend,
+              dj_entries.next_weeks_open, dj_entries.next_weeks_close, dj_entries.previous_weeks_volume]
+    return np.transpose(np.array(arrays))
+
+
 if __name__ == "__main__":
-    outdict = read_csv(Path("local_data/"+DOW_JONES_RELATIVE_PATH))
+    outdict = read_csv()
     djones_object = from_dict_to_dow_jones_entries(outdict)
     print(djones_object)
+    new_array = from_dow_jones_entries_to_numpy(djones_object)
+    print(np.shape(new_array))
