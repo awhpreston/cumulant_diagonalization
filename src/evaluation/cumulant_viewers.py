@@ -266,7 +266,7 @@ def plot_kurtosis_histograms(cokurtosis_arrays: CokurtosisArrays,
                              mostly_diagonal_bins: int = 10,
                              semi_diagonal_bins: int = 20,
                              mostly_off_diagonal_bins: int = 30,
-                             off_diagonal_bins: int = 50):
+                             off_diagonal_bins: int = 50) -> None:
     """
     Plots histograms showing the cokurt distributions taking the output of cokurt_lists(:) as input
     :param cokurtosis_arrays: CokurtosisArrays object
@@ -308,4 +308,3 @@ def plot_kurtosis_histograms(cokurtosis_arrays: CokurtosisArrays,
     plt.hist(cokurtosis_arrays.off_diagonal, bins=off_diagonal_bins)
     plt.title('Mean: %.2E, \n median: %.2E' % (Decimal(mean), Decimal(median)))
     plt.show()
-    return
