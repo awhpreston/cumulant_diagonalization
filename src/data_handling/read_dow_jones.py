@@ -2,13 +2,12 @@
 Module for loading and handling DOW Jones data.
 """
 
-import csv
 import numpy as np
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Dict, List, Any
 
 from data_handling.global_data_params import DOW_JONES_RELATIVE_PATH, DEFAULT_LOCAL_PATH
+from data_handling.data_utils import read_csv
 
 
 @dataclass
@@ -29,32 +28,6 @@ class DowJonesEntries:
     percent_change_next_weeks_price: np.ndarray
     days_to_next_dividend: np.ndarray
     percent_return_next_dividend: np.ndarray
-
-
-def read_csv(file_path: Path = DEFAULT_LOCAL_PATH / DOW_JONES_RELATIVE_PATH) -> Dict[str, List[Any]]:
-    """
-    Reads a comma-separated-variables file to a dictionary whose keys are the first row entries and whose values
-    are lists of row entries for each column.
-    :param file_path: path to the csv file
-    :return: {first row entry: [subsequent row entries]}
-    """
-    with open(file_path, newline='') as csvfile:
-        reader = csv.reader(csvfile, delimiter=',', quotechar='|')
-        row_num = 0
-        output_dict = dict()
-        key_map = dict()  # maps column index to dict key
-        for row in reader:
-            entries = [entry for entry in row]
-            if row_num == 0:
-                for i, entry in enumerate(entries):
-                    key_map[i] = entry
-                    output_dict[entry] = list()
-            else:
-                for i, entry in enumerate(entries):
-                    key = key_map[i]
-                    output_dict[key].append(entry)
-            row_num += 1
-    return output_dict
 
 
 def from_dict_to_dow_jones_entries(data_dict: Dict[str, List[Any]]) -> DowJonesEntries:
@@ -116,7 +89,7 @@ def from_dow_jones_entries_to_numpy(dj_entries: DowJonesEntries) -> np.ndarray:
 
 
 if __name__ == "__main__":
-    outdict = read_csv()
+    outdict = read_csv(DEFAULT_LOCAL_PATH / DOW_JONES_RELATIVE_PATH)
     djones_object = from_dict_to_dow_jones_entries(outdict)
     print(djones_object)
     new_array = from_dow_jones_entries_to_numpy(djones_object)
