@@ -1,26 +1,32 @@
 """
-This is the script to run evaluations of algorithms on DOW-Jones data
+This is the script to run evaluations of algorithms on Swarm data
 """
 
+import numpy as np
 from sklearn.decomposition import FastICA
 from algorithms.forward_deep_ica import DeepPowerICA, DeepPowerPCA
-from data_handling.global_data_params import DEFAULT_LOCAL_PATH, DOW_JONES_RELATIVE_PATH
-from data_handling.read_dow_jones import read_csv, from_dict_to_dow_jones_entries, from_dow_jones_entries_to_numpy
+from data_handling.global_data_params import DEFAULT_LOCAL_PATH, SWARM_FLOCKING_RELATIVE_PATH
+from data_handling.read_swarm_data import read_csv, split_swarm_data_into_features_and_labels
 from evaluation.cumulant_viewers import get_coskew_arrays, get_cokurt_arrays, \
     plot_covariance_histograms, plot_skew_histograms, plot_kurtosis_histograms
 
 
 if __name__ == "__main__":
-    data = from_dow_jones_entries_to_numpy(from_dict_to_dow_jones_entries(read_csv(
-        DEFAULT_LOCAL_PATH / DOW_JONES_RELATIVE_PATH)))
 
-    # fast_ica = FastICA(n_components=10)
+    print("Reading swarm data")
+    out_dict = read_csv(DEFAULT_LOCAL_PATH / SWARM_FLOCKING_RELATIVE_PATH)
+    data, _ = split_swarm_data_into_features_and_labels(out_dict)
+    print(f"Dimensions are {np.shape(data)}")  # expecting (24016, 2400)
+
+    print("Extracting independent features")
+
+    # fast_ica = FastICA(n_components=20)
     # transformed_data = fast_ica.fit_transform(data)
-    #
-    # deep_power_pca = DeepPowerPCA(layers=[12, 11, 10])
+
+    # deep_power_pca = DeepPowerPCA(layers=[40, 30, 20])
     # transformed_data = deep_power_pca.fit_transform(data)
 
-    deep_power_ica = DeepPowerICA(layers=[12, 11, 10])
+    deep_power_ica = DeepPowerICA(layers=[30, 25, 20])
     transformed_data = deep_power_ica.fit_transform(data)
 
     print("Showing covariance")
